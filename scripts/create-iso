@@ -1,0 +1,9 @@
+#!/bin/bash
+
+out=$1
+in=$2
+
+mkdir iso
+cp $in iso
+genisoimage -quiet -V 'Pong' -input-charset iso8859-1 -o $out -b $in -hide $in iso/
+rm -r iso
