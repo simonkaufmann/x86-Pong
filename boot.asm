@@ -1,40 +1,49 @@
         org 7C00h
+        bits 16
 
         jmp short Start
 
-Msg:    db "Hello World!"
-EndMsg:
+Start:  mov ax, 0
+        mov ds, ax
+        mov es, ax
+        mov ax, 7E00h
+        mov ss, ax
+        mov sp, 4096
+        mov bp, 4096
 
-Start:  mov bx, 000Fh
-        mov cx, 1
-        xor dx, dx
-        mov ds, dx
-        cld
-
-Print:  mov si, Msg
-
-Char:   mov ah, 2
-        int 10h
-        lodsb
-
-        mov ah, 9
+        mov ax, 13h
         int 10h
 
-        inc dl
+        mov bx, 12
+        push bx
+        mov bx, 100
+        push bx
+        mov bx, 100
+        push bx
+        call print_pixel
 
-        cmp dl, 80
-        jne Skip
-        inc dh
+Loop:   jmp Loop
 
-        cmp dh, 25
-        jne Skip
-        xor dh, dh
+print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2 bytes)
+        ;push bp
+        ;mov bp, sp
 
-Skip:   cmp si, EndMsg
-        jne Char
-Loop:
-        jmp Loop
+;        mov ax, [bp-2] ; color
+;        mov dx, [bp-4] ; y
+;        mov cx, [bp-6] ; x
+        pop ax
+        pop cx
+        pop dx
+        pop ax
+        mov ah, 0Ch
+;        mov al, 12
+;        mov ah, 0Ch
+;        mov cx, 100
+;        mov dx, 100
+        int 10h
 
-times 0200h - 2 - ($ - $$) db 0
+        ;mov sp, bp
+        ;pop bp
+        ret
 
-        dw 0AA55h
+          
