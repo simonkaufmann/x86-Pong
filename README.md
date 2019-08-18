@@ -21,3 +21,4 @@ https://stackoverflow.com/questions/6542160/variable-target-in-a-makefile
 https://stackoverflow.com/questions/34268518/creating-a-bootable-iso-image-with-custom-bootloader  
 https://en.wikipedia.org/wiki/X86_instruction_listings  
 https://en.wikipedia.org/wiki/X86_calling_conventions  
+https://www.nasm.us/doc/  
