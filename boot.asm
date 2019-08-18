@@ -14,19 +14,23 @@ Start:  mov ax, 0           ; Stack initialisation
         mov ax, 13h         ; Set video mode to graphic
         int 10h
 
-        mov bx, 15          ; print a pixel
+        mov bx, [PADDLE_LEFT_Y_POS]         ; y position
         push bx
-        mov bx, 100
-        push bx
-        mov bx, 100
-        push bx
-        call print_pixel
-
-        mov bx, 50         ; y position
-        push bx
-        mov bx, 20         ; x position
+        mov bx, [PADDLE_LEFT_X_POS]         ; x position
         push bx
         call print_paddle
+
+        mov bx, [PADDLE_RIGHT_Y_POS]         ; y position
+        push bx
+        mov bx, [PADDLE_RIGHT_X_POS]         ; x position
+        push bx
+        call print_paddle
+
+        mov bx, [BALL_Y_POS]         ; y position
+        push bx
+        mov bx, [BALL_X_POS]         ; x position
+        push bx
+        call print_ball
 
 Loop:   jmp Loop            ; Infinite loop
 
@@ -44,7 +48,43 @@ print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2
         pop bp
         ret
 
+print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
+    push bp
+    mov bp, sp
+
+    mov ax, [BALL_SIZE]     ; y size
+    push ax
+    mov ax, [BALL_SIZE]     ; x size
+    push ax
+    mov ax, [bp+6]              ; y coord
+    push ax
+    mov ax, [bp+4]              ; x coord
+    push ax
+    call print_box
+
+    mov sp, bp
+    pop bp
+    ret
+
 print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
+    push bp
+    mov bp, sp
+
+    mov ax, [PADDLE_Y_SIZE]     ; y size
+    push ax
+    mov ax, [PADDLE_X_SIZE]     ; x size
+    push ax
+    mov ax, [bp+6]              ; y coord
+    push ax
+    mov ax, [bp+4]              ; x coord
+    push ax
+    call print_box
+
+    mov sp, bp
+    pop bp
+    ret
+
+print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         push bp
         mov bp, sp
 
@@ -74,7 +114,8 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
         mov [bp-4], ax
 
         mov ax, [bp-4]
-        cmp ax, [PADDLE_Y_SIZE]     ; check index_y < PADDLE_Y_SIZE
+        mov bx, [bp+10]
+        cmp ax, bx     ; check index_y < y_size
         jle .for_y
 .end_for_y:
 
@@ -83,7 +124,7 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
         mov [bp-2], ax
 
         mov ax, [bp-2]
-        cmp ax, [PADDLE_X_SIZE]     ; check index_x < PADDLE_X_SIZE
+        cmp ax, [bp+8]     ; check index_x < x_size
         jle .for_x
 .end_for_x:
 
@@ -95,16 +136,26 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
         ret
 
 PADDLE_LEFT_X_POS:
-5
+dw 5
 PADDLE_RIGHT_X_POS:
-635
+dw 625
 PADDLE_LEFT_Y_POS:
-4
+dw 4
 PADDLE_RIGHT_Y_POS:
-17
+dw 17
 PADDLE_X_SIZE:
 dw 7
 PADDLE_Y_SIZE:
 dw 40
+BALL_SIZE:
+dw 5
+BALL_X_POS:
+dw 318
+BALL_Y_POS:
+dw 238
+BALL_SPEED_X:
+dw 5
+BALL_SPEED_Y:
+dw 5
 COLOR:
 dw 15
