@@ -1,3 +1,12 @@
+; 320 - PADDLE_X_SIZE
+%define SCREEN_X        315
+
+; 320 - PADDLE_X_SIZE
+%define SCREEN_Y        195
+
+%define KEY_LEFT_DOWN   115
+
+   
         org 7C00h
         bits 16
 
@@ -48,7 +57,7 @@ Delay:  dec bx
         inc dx
 
         call get_key
-        cmp al, [KEY_LEFT_DOWN]
+        cmp al, KEY_LEFT_DOWN
         je .skip_ball_step
         call clear_screen
         call ball_step
@@ -97,9 +106,9 @@ check_boundaries:
         mov bp, sp
 
         mov ax, [BALL_X_POS]
-        cmp ax, [SCREEN_X]
+        cmp ax, SCREEN_X
         jl .skip_cap_top_x
-        mov ax, [SCREEN_X]
+        mov ax, SCREEN_X
         mov cx, [BALL_SPEED_X]
         imul cx, -1
         mov [BALL_SPEED_X], cx
@@ -114,9 +123,9 @@ check_boundaries:
         mov [BALL_X_POS], ax
 
         mov ax, [BALL_Y_POS]
-        cmp ax, [SCREEN_Y]
+        cmp ax, SCREEN_Y
         jl .skip_cap_top_y
-        mov ax, [SCREEN_Y]
+        mov ax, SCREEN_Y
         mov cx, [BALL_SPEED_Y]
         imul cx, -1
         mov [BALL_SPEED_Y], cx
@@ -243,10 +252,6 @@ print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         pop bp
         ret
 
-SCREEN_X:
-dw 315 ; 320 - PADDLE_X_SIZE
-SCREEN_Y:
-dw 195 ; 200 - PADDLE_Y_SIZE
 PADDLE_LEFT_X_POS:
 dw 5
 PADDLE_RIGHT_X_POS:
@@ -269,7 +274,3 @@ BALL_SPEED_X:
 dw 5
 BALL_SPEED_Y:
 dw 5
-COLOR:
-dw 15
-KEY_LEFT_DOWN:
-dw 115 ; ASCII 's'
