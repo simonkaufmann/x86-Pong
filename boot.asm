@@ -11,7 +11,7 @@ Start:  mov ax, 0           ; Stack initialisation
         mov sp, 4096
         mov bp, 4096
 
-        mov ax, 13h         ; Set video mode to graphic
+        mov ax, 04h         ; Set video mode to graphic
         int 10h
 
         mov bx, [PADDLE_LEFT_Y_POS]         ; y position
@@ -81,6 +81,40 @@ check_boundaries:
         push bp
         mov bp, sp
 
+        mov ax, [BALL_X_POS]
+        cmp ax, [SCREEN_X]
+        jl .skip_cap_top_x
+        mov ax, [SCREEN_X]
+        mov cx, [BALL_SPEED_X]
+        imul cx, -1
+        mov [BALL_SPEED_X], cx
+.skip_cap_top_x:
+        cmp ax, 0
+        jg .skip_cap_bottom_x
+        mov ax, 0
+        mov cx, [BALL_SPEED_X]
+        imul cx, -1
+        mov [BALL_SPEED_X], cx
+.skip_cap_bottom_x:
+        mov [BALL_X_POS], ax
+
+        mov ax, [BALL_Y_POS]
+        cmp ax, [SCREEN_Y]
+        jl .skip_cap_top_y
+        mov ax, [SCREEN_Y]
+        mov cx, [BALL_SPEED_Y]
+        imul cx, -1
+        mov [BALL_SPEED_Y], cx
+.skip_cap_top_y:
+        cmp ax, 0
+        jg .skip_cap_bottom_y
+        mov ax, 0
+        mov cx, [BALL_SPEED_Y]
+        imul cx, -1
+        mov [BALL_SPEED_Y], cx
+.skip_cap_bottom_y:
+        mov [BALL_Y_POS], ax
+
         mov sp, bp
         pop bp
         ret
@@ -89,7 +123,7 @@ clear_screen:
         push bp
         mov bp, sp
 
-        mov ax, 13h         ; Set video mode to graphic will clear screen
+        mov ax, 04h         ; Set video mode to graphic will clear screen
         int 10h
 
         mov sp, bp
@@ -195,9 +229,9 @@ print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         ret
 
 SCREEN_X:
-dw 640
+dw 315 ; 320 - PADDLE_X_SIZE
 SCREEN_Y:
-dw 480
+dw 195 ; 200 - PADDLE_Y_SIZE
 PADDLE_LEFT_X_POS:
 dw 5
 PADDLE_RIGHT_X_POS:
@@ -213,9 +247,9 @@ dw 40
 BALL_SIZE:
 dw 5
 BALL_X_POS:
-dw 318
+dw 150
 BALL_Y_POS:
-dw 238
+dw 100;
 BALL_SPEED_X:
 dw 5
 BALL_SPEED_Y:
