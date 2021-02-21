@@ -31,8 +31,27 @@ Start:  mov ax, 0           ; Stack initialisation
         mov bx, [BALL_X_POS]         ; x position
         push bx
         call print_ball
+        
+        mov cx, [BALL_X_POS]
+        mov dx, [BALL_Y_POS]
 
-Loop:   jmp Loop            ; Infinite loop
+Loop:   
+        mov ax, 0ffh
+Delay2: mov bx, 0FFFFh
+Delay:  dec bx
+        cmp bx, 0h
+        jne Delay
+        dec ax
+        jne Delay2
+
+        inc cx
+        inc dx
+
+        push dx
+        push cx
+        call print_ball
+
+        jmp Loop            ; Infinite loop
 
 print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2 bytes)
         push bp
