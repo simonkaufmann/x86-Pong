@@ -36,8 +36,8 @@ Start:  mov ax, 0           ; Stack initialisation
         mov dx, [BALL_Y_POS]
 
 Loop:   
-        mov ax, 0ffh
-Delay2: mov bx, 0FFFFh
+        mov ax, 06ffh  ; for speed of delay
+Delay2: mov bx, 0FFFFh ; for speed of delay
 Delay:  dec bx
         cmp bx, 0h
         jne Delay
@@ -47,11 +47,54 @@ Delay:  dec bx
         inc cx
         inc dx
 
-        push dx
-        push cx
-        call print_ball
+        call clear_screen
+
+        call ball_step
 
         jmp Loop            ; Infinite loop
+
+ball_step:
+        push bp
+        mov bp, sp
+
+        mov ax, [BALL_X_POS]
+        add ax, [BALL_SPEED_X]
+        mov [BALL_X_POS], ax
+
+        mov ax, [BALL_Y_POS]
+        add ax, [BALL_SPEED_Y]
+        mov [BALL_Y_POS], ax
+
+        call check_boundaries
+
+        mov ax, [BALL_Y_POS]         ; y position
+        push ax
+        mov ax, [BALL_X_POS]         ; x position
+        push ax
+        call print_ball
+
+        mov sp, bp
+        pop bp
+        ret
+
+check_boundaries:
+        push bp
+        mov bp, sp
+
+        mov sp, bp
+        pop bp
+        ret
+
+clear_screen:
+        push bp
+        mov bp, sp
+
+        mov ax, 13h         ; Set video mode to graphic will clear screen
+        int 10h
+
+        mov sp, bp
+        pop bp
+        ret
 
 print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2 bytes)
         push bp
@@ -123,7 +166,7 @@ print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         mov bx, [bp-4]      ; y = index_y + y argument of print paddle
         add bx, [bp+6]
         push bx
-        mov ax, [bp-2]      ; x = index_x + x argument of prind paddle
+        mov ax, [bp-2]      ; x = index_x + x argument of print paddle
         add ax, [bp+4]
         push ax
         call print_pixel
@@ -147,13 +190,14 @@ print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         jle .for_x
 .end_for_x:
 
-
-        add esp, 4
-
         mov sp, bp
         pop bp
         ret
 
+SCREEN_X:
+dw 640
+SCREEN_Y:
+dw 480
 PADDLE_LEFT_X_POS:
 dw 5
 PADDLE_RIGHT_X_POS:
