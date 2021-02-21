@@ -4,7 +4,11 @@
 ; 320 - PADDLE_X_SIZE
 %define SCREEN_Y        195
 
-%define KEY_LEFT_DOWN   115
+%define KEY_LEFT_DOWN_PRESSED   01fh
+%define KEY_LEFT_DOWN_RELEASED   09fh
+
+%define PRESSED 1
+%define RELEASED 0
 
    
         org 7C00h
@@ -53,17 +57,13 @@ Delay:  dec bx
         dec ax
         jne Delay2
 
-        inc cx
-        inc dx
-
         call get_key
-        cmp al, KEY_LEFT_DOWN
+        cmp dword [LEFT_DOWN], PRESSED
         je .skip_ball_step
         call clear_screen
         call ball_step
-        jmp Loop            ; Infinite loop
 .skip_ball_step:
-        jmp .skip_ball_step
+        jmp Loop            ; Infinite loop
 
 get_key:
         mov ah, 01h ; Test key BIOS
@@ -72,9 +72,17 @@ get_key:
 
         mov ah, 00h
         int 16h ; int 16h will put ASCII character in al and scan code in AH
-        ret
+        
+        cmp ah, KEY_LEFT_DOWN_PRESSED
+        jne .skip_left_down_pressed
+        mov dword [LEFT_DOWN], PRESSED
+.skip_left_down_pressed:
+        cmp ah, KEY_LEFT_DOWN_RELEASED
+        jne .skip_left_down_released
+        mov dword [LEFT_DOWN], RELEASED
+.skip_left_down_released:
+
 .no_key_event:
-        mov ax, 0 ; Return 0 for no key event
         ret
 
 ball_step:
@@ -274,3 +282,7 @@ BALL_SPEED_X:
 dw 5
 BALL_SPEED_Y:
 dw 5
+LEFT_DOWN:
+dw 0
+LEFT_UP:
+dw 0
