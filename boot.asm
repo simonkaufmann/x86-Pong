@@ -47,11 +47,26 @@ Delay:  dec bx
         inc cx
         inc dx
 
+        call get_key
+        cmp al, [KEY_LEFT_DOWN]
+        je .skip_ball_step
         call clear_screen
-
         call ball_step
-
         jmp Loop            ; Infinite loop
+.skip_ball_step:
+        jmp .skip_ball_step
+
+get_key:
+        mov ah, 01h ; Test key BIOS
+        int 16h
+        jz .no_key_event
+
+        mov ah, 00h
+        int 16h ; int 16h will put ASCII character in al and scan code in AH
+        ret
+.no_key_event:
+        mov ax, 0 ; Return 0 for no key event
+        ret
 
 ball_step:
         push bp
@@ -256,3 +271,5 @@ BALL_SPEED_Y:
 dw 5
 COLOR:
 dw 15
+KEY_LEFT_DOWN:
+dw 115 ; ASCII 's'

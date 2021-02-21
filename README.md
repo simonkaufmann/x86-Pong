@@ -29,6 +29,7 @@ https://www.nasm.us/doc/
 
 Reading keyboard:
 http://www.ctyme.com/intr/int-16.htm
+http://www.ctyme.com/intr/rb-1754.htm
 
 Setting video mode:
 http://vitaly_filatov.tripod.com/ng/asm/asm_023.1.html
