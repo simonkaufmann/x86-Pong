@@ -20,5 +20,16 @@ https://en.wikibooks.org/wiki/X86_Assembly/Bootloaders
 https://stackoverflow.com/questions/6542160/variable-target-in-a-makefile  
 https://stackoverflow.com/questions/34268518/creating-a-bootable-iso-image-with-custom-bootloader  
 https://en.wikipedia.org/wiki/X86_instruction_listings  
+
+Cdecl calling convention:
 https://en.wikipedia.org/wiki/X86_calling_conventions  
+
+NASM manual:
 https://www.nasm.us/doc/  
+
+Reading keyboard:
+http://www.ctyme.com/intr/int-16.htm
+
+Setting video mode:
+http://vitaly_filatov.tripod.com/ng/asm/asm_023.1.html
+
