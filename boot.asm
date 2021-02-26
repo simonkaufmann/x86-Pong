@@ -16,6 +16,10 @@
 
 %define DELAY_1         0FFFFh
 %define DELAY_2         06ffh
+
+%define BALL_SIZE       5
+%define PADDLE_Y_SIZE   40
+%define PADDLE_X_SIZE   7
    
         org 7C00h
         bits 16
@@ -44,7 +48,7 @@ Delay:  dec bx
         jne Delay2
         ; End of delay code
 
-        call process_key
+        ; call process_key
 
         call clear_screen
 
@@ -64,103 +68,78 @@ Delay:  dec bx
         
         jmp Loop            ; Game Loop
 
-process_key:
-        mov ah, 01h ; Test key BIOS
-        int 16h
-        jz .no_key_event
+; process_key:
+;         mov ah, 01h ; Test key BIOS
+;         int 16h
+;         jz .no_key_event
 
-        mov ah, 00h
-        int 16h ; int 16h will put ASCII character in al and scan code in AH
+;         mov ah, 00h
+;         int 16h ; int 16h will put ASCII character in al and scan code in AH
         
-        cmp al, KEY_LEFT_UP
-        jne .skip_left_up
+;         cmp al, KEY_LEFT_UP
+;         jne .skip_left_up
 
-        mov bx, [PADDLE_LEFT_Y_POS]
-        sub bx, PADDLE_Y_STEP
-        mov [PADDLE_LEFT_Y_POS], bx
+;         mov bx, [PADDLE_LEFT_Y_POS]
+;         sub bx, PADDLE_Y_STEP
 
-        jmp .end_if
-.skip_left_up:
-        cmp al, KEY_LEFT_DOWN
-        jne .skip_left_down
+;         cmp bx, 0
+;         jl .clamp_left_up
+;         mov [PADDLE_LEFT_Y_POS], bx
+;         jmp .end_if
+; .clamp_left_up:
+;         mov word [PADDLE_LEFT_Y_POS], 0
+;         jmp .end_if
 
-        mov bx, [PADDLE_LEFT_Y_POS]
-        add bx, PADDLE_Y_STEP
-        mov [PADDLE_LEFT_Y_POS], bx
+; .skip_left_up:
+;         cmp al, KEY_LEFT_DOWN
+;         jne .skip_left_down
 
-        jmp .end_if
-.skip_left_down:
-        cmp al, KEY_RIGHT_UP
-        jne .skip_right_up
+;         mov bx, [PADDLE_LEFT_Y_POS]
+;         add bx, PADDLE_Y_STEP
 
-        mov bx, [PADDLE_RIGHT_Y_POS]
-        sub bx, PADDLE_Y_STEP
-        mov [PADDLE_RIGHT_Y_POS], bx
+;         cmp bx, 155
+;         jg .clamp_left_down
+;         mov [PADDLE_LEFT_Y_POS], bx
+;         jmp .end_if
+; .clamp_left_down:
+;         mov word [PADDLE_LEFT_Y_POS], 155
+;         jmp .end_if
 
-        jmp .end_if
-.skip_right_up:
-        cmp al, KEY_RIGHT_DOWN
-        jne .skip_right_down
+; .skip_left_down:
+;         cmp al, KEY_RIGHT_UP
+;         jne .skip_right_up
 
-        mov bx, [PADDLE_RIGHT_Y_POS]
-        add bx, PADDLE_Y_STEP
-        mov [PADDLE_RIGHT_Y_POS], bx
+;         mov bx, [PADDLE_RIGHT_Y_POS]
+;         sub bx, PADDLE_Y_STEP
 
-        jmp .end_if
-.skip_right_down:
+;         cmp bx, 0
+;         jl .clamp_right_up
+;         mov [PADDLE_RIGHT_Y_POS], bx
+;         jmp .end_if
+; .clamp_right_up:
+;         mov word [PADDLE_RIGHT_Y_POS], 0
+;         jmp .end_if
 
-.end_if:
-.no_key_event:
-        ret
+; .skip_right_up:
+;         cmp al, KEY_RIGHT_DOWN
+;         jne .skip_right_down
 
-; paddle_left_up:
-;         push bp
-;         mov bp, sp
-;         push ax
+;         mov bx, [PADDLE_RIGHT_Y_POS]
+;         add bx, PADDLE_Y_STEP
 
-;         mov ax, [PADDLE_LEFT_Y_POS]
-;         sub ax, PADDLE_Y_STEP
-;         mov [PADDLE_LEFT_Y_POS], ax
+;         cmp bx, 155
+;         jg .clamp_right_down
+;         mov [PADDLE_RIGHT_Y_POS], bx
+;         jmp .end_if
+; .clamp_right_down:
+;         mov word [PADDLE_RIGHT_Y_POS], 155
+;         jmp .end_if
 
-;         pop ax
-;         mov sp, bp
-;         pop bp
-;         ret
+;         jmp .end_if
+; .skip_right_down:
 
-; paddle_left_down:
-;         push bp
-;         mov bp, sp
-
-;         mov ax, [PADDLE_LEFT_Y_POS]
-;         add ax, PADDLE_Y_STEP
-;         mov [PADDLE_LEFT_Y_POS], ax
-
-;         mov sp, bp
-;         pop bp
-;         ret
-
-; paddle_right_up:
-;         push bp
-;         mov bp, sp
-
-;         mov ax, [PADDLE_RIGHT_Y_POS]
-;         sub ax, PADDLE_Y_STEP
-;         mov [PADDLE_RIGHT_Y_POS], ax
-
-;         mov sp, bp
-;         pop bp
-;         ret
-
-; paddle_right_down:
-;         push bp
-;         mov bp, sp
-
-;         mov ax, [PADDLE_RIGHT_Y_POS]
-;         add ax, PADDLE_Y_STEP
-;         mov [PADDLE_RIGHT_Y_POS], ax
-
-;         mov sp, bp
-;         pop bp
+; .end_if:
+; .no_key_event:
 ;         ret
 
 ball_step:
@@ -254,9 +233,9 @@ print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
     push bp
     mov bp, sp
 
-    mov ax, [BALL_SIZE]     ; y size
+    mov ax, BALL_SIZE     ; y size
     push ax
-    mov ax, [BALL_SIZE]     ; x size
+    mov ax, BALL_SIZE     ; x size
     push ax
     mov ax, [BALL_Y_POS]              ; y coord
     push ax
@@ -272,9 +251,9 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
     push bp
     mov bp, sp
 
-    mov ax, [PADDLE_Y_SIZE]     ; y size
+    mov ax, PADDLE_Y_SIZE     ; y size
     push ax
-    mov ax, [PADDLE_X_SIZE]     ; x size
+    mov ax, PADDLE_X_SIZE     ; x size
     push ax
     mov ax, [bp+6]              ; y coord
     push ax
@@ -342,12 +321,6 @@ PADDLE_LEFT_Y_POS:
 dw 4
 PADDLE_RIGHT_Y_POS:
 dw 17
-PADDLE_X_SIZE:
-dw 7
-PADDLE_Y_SIZE:
-dw 40
-BALL_SIZE:
-dw 5
 BALL_X_POS:
 dw 150
 BALL_Y_POS:
