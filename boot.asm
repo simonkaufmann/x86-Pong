@@ -88,37 +88,37 @@ Delay:  dec bx
         jmp Loop            ; Infinite loop
 
 process_key:
-;         mov ah, 01h ; Test key BIOS
-;         int 16h
-;         jz .no_key_event
+        mov ah, 01h ; Test key BIOS
+        int 16h
+        jz .no_key_event
 
-;         mov ah, 00h
-;         int 16h ; int 16h will put ASCII character in al and scan code in AH
+        mov ah, 00h
+        int 16h ; int 16h will put ASCII character in al and scan code in AH
         
-;         cmp al, KEY_LEFT_UP
-;         jne .skip_left_up
-;         call paddle_left_up
-;         jmp .end_if
-; .skip_left_up:
-;         cmp ah, KEY_LEFT_DOWN
-;         jne .skip_left_down
-;         call paddle_left_down
-;         jmp .end_if
-; .skip_left_down:
-;         cmp ah, KEY_RIGHT_UP
-;         jne .skip_right_up
-;         call paddle_right_up
-;         jmp .end_if
-; .skip_right_up:
-;         cmp ah, KEY_RIGHT_DOWN
-;         jne .skip_right_down
-;         call paddle_right_down
-;         jmp .end_if
-; .skip_right_down:
+        cmp al, KEY_LEFT_UP
+        jne .skip_left_up
+        ;call paddle_left_up
+        jmp .end_if
+.skip_left_up:
+        cmp ah, KEY_LEFT_DOWN
+        jne .skip_left_down
+        ;call paddle_left_down
+        jmp .end_if
+.skip_left_down:
+        cmp ah, KEY_RIGHT_UP
+        jne .skip_right_up
+        ;call paddle_right_up
+        jmp .end_if
+.skip_right_up:
+        cmp ah, KEY_RIGHT_DOWN
+        jne .skip_right_down
+        ;call paddle_right_down
+        jmp .end_if
+.skip_right_down:
 
-; .end_if:
-; .no_key_event:
-;         ret
+.end_if:
+.no_key_event:
+        ret
 
 ; paddle_left_up:
 ;         push bp
