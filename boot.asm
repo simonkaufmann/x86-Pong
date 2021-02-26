@@ -1,11 +1,19 @@
 ; 320 - PADDLE_X_SIZE
 %define SCREEN_X        315
-
 ; 320 - PADDLE_X_SIZE
 %define SCREEN_Y        195
 
-%define KEY_LEFT_DOWN_PRESSED   01fh
-%define KEY_LEFT_DOWN_RELEASED   09fh
+; ASCII 'w'
+%define KEY_LEFT_UP     119
+; ASCII 's'
+%define KEY_LEFT_DOWN   115
+; ASCII 'p'
+%define KEY_RIGHT_UP    112
+; ASCII 'l'
+%define KEY_RIGHT_DOWN  108
+
+%define PADDLE_Y_STEP   5
+
 
 %define PRESSED 1
 %define RELEASED 0
@@ -49,6 +57,7 @@ Start:  mov ax, 0           ; Stack initialisation
         mov dx, [BALL_Y_POS]
 
 Loop:   
+        jmp Loop
         mov ax, 06ffh  ; for speed of delay
 Delay2: mov bx, 0FFFFh ; for speed of delay
 Delay:  dec bx
@@ -57,15 +66,28 @@ Delay:  dec bx
         dec ax
         jne Delay2
 
-        call get_key
-        cmp dword [LEFT_DOWN], PRESSED
-        je .skip_ball_step
+        call process_key
+
         call clear_screen
         call ball_step
+        
+        mov bx, [PADDLE_LEFT_Y_POS]         ; y position
+        push bx
+        mov bx, [PADDLE_LEFT_X_POS]         ; x position
+        push bx
+        call print_paddle
+
+        mov bx, [PADDLE_RIGHT_Y_POS]         ; y position
+        push bx
+        mov bx, [PADDLE_RIGHT_X_POS]         ; x position
+        push bx
+        call print_paddle
+
+
 .skip_ball_step:
         jmp Loop            ; Infinite loop
 
-get_key:
+process_key:
         mov ah, 01h ; Test key BIOS
         int 16h
         jz .no_key_event
@@ -73,16 +95,79 @@ get_key:
         mov ah, 00h
         int 16h ; int 16h will put ASCII character in al and scan code in AH
         
-        cmp ah, KEY_LEFT_DOWN_PRESSED
-        jne .skip_left_down_pressed
-        mov dword [LEFT_DOWN], PRESSED
-.skip_left_down_pressed:
-        cmp ah, KEY_LEFT_DOWN_RELEASED
-        jne .skip_left_down_released
-        mov dword [LEFT_DOWN], RELEASED
-.skip_left_down_released:
+        cmp al, KEY_LEFT_UP
+        jne .skip_left_up
+        call paddle_left_up
+        jmp .end_if
+.skip_left_up:
+        cmp ah, KEY_LEFT_DOWN
+        jne .skip_left_down
+        call paddle_left_down
+        jmp .end_if
+.skip_left_down:
+        cmp ah, KEY_RIGHT_UP
+        jne .skip_right_up
+        call paddle_right_up
+        jmp .end_if
+.skip_right_up:
+        cmp ah, KEY_RIGHT_DOWN
+        jne .skip_right_down
+        call paddle_right_down
+        jmp .end_if
+.skip_right_down:
 
+.end_if:
 .no_key_event:
+        ret
+
+paddle_left_up:
+        push bp
+        mov bp, sp
+        push ax
+
+        mov ax, [PADDLE_LEFT_Y_POS]
+        sub ax, PADDLE_Y_STEP
+        mov [PADDLE_LEFT_Y_POS], ax
+
+        pop ax
+        mov sp, bp
+        pop bp
+        ret
+
+paddle_left_down:
+        push bp
+        mov bp, sp
+
+        mov ax, [PADDLE_LEFT_Y_POS]
+        add ax, PADDLE_Y_STEP
+        mov [PADDLE_LEFT_Y_POS], ax
+
+        mov sp, bp
+        pop bp
+        ret
+
+paddle_right_up:
+        push bp
+        mov bp, sp
+
+        mov ax, [PADDLE_RIGHT_Y_POS]
+        sub ax, PADDLE_Y_STEP
+        mov [PADDLE_RIGHT_Y_POS], ax
+
+        mov sp, bp
+        pop bp
+        ret
+
+paddle_right_down:
+        push bp
+        mov bp, sp
+
+        mov ax, [PADDLE_RIGHT_Y_POS]
+        add ax, PADDLE_Y_STEP
+        mov [PADDLE_RIGHT_Y_POS], ax
+
+        mov sp, bp
+        pop bp
         ret
 
 ball_step:
@@ -282,7 +367,3 @@ BALL_SPEED_X:
 dw 5
 BALL_SPEED_Y:
 dw 5
-LEFT_DOWN:
-dw 0
-LEFT_UP:
-dw 0
