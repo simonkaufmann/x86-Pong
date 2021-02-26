@@ -12,7 +12,7 @@
 ; ASCII 'l'
 %define KEY_RIGHT_DOWN  108
 
-%define PADDLE_Y_STEP   5
+%define PADDLE_Y_STEP   10
 
 %define DELAY_1         0FFFFh
 %define DELAY_2         06ffh
@@ -74,22 +74,38 @@ process_key:
         
         cmp al, KEY_LEFT_UP
         jne .skip_left_up
-        ;call paddle_left_up
+
+        mov bx, [PADDLE_LEFT_Y_POS]
+        sub bx, PADDLE_Y_STEP
+        mov [PADDLE_LEFT_Y_POS], bx
+
         jmp .end_if
 .skip_left_up:
-        cmp ah, KEY_LEFT_DOWN
+        cmp al, KEY_LEFT_DOWN
         jne .skip_left_down
-        ;call paddle_left_down
+
+        mov bx, [PADDLE_LEFT_Y_POS]
+        add bx, PADDLE_Y_STEP
+        mov [PADDLE_LEFT_Y_POS], bx
+
         jmp .end_if
 .skip_left_down:
-        cmp ah, KEY_RIGHT_UP
+        cmp al, KEY_RIGHT_UP
         jne .skip_right_up
-        ;call paddle_right_up
+
+        mov bx, [PADDLE_RIGHT_Y_POS]
+        sub bx, PADDLE_Y_STEP
+        mov [PADDLE_RIGHT_Y_POS], bx
+
         jmp .end_if
 .skip_right_up:
-        cmp ah, KEY_RIGHT_DOWN
+        cmp al, KEY_RIGHT_DOWN
         jne .skip_right_down
-        ;call paddle_right_down
+
+        mov bx, [PADDLE_RIGHT_Y_POS]
+        add bx, PADDLE_Y_STEP
+        mov [PADDLE_RIGHT_Y_POS], bx
+
         jmp .end_if
 .skip_right_down:
 
