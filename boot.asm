@@ -62,8 +62,6 @@ Delay:  dec bx
 
         call ball_step
         
-
-
         jmp Loop            ; Game Loop
 
 process_key:
@@ -237,6 +235,8 @@ print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2
         ret
 
 print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
+    push bp
+    mov bp, sp
 
     mov ax, [BALL_SIZE]     ; y size
     push ax
@@ -248,6 +248,8 @@ print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
     push ax
     call print_box
 
+    mov sp, bp
+    pop bp
     ret
 
 print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
