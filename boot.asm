@@ -14,10 +14,8 @@
 
 %define PADDLE_Y_STEP   5
 
-
-%define PRESSED 1
-%define RELEASED 0
-
+%define DELAY_1         0FFFFh
+%define DELAY_2         06ffh
    
         org 7C00h
         bits 16
@@ -35,42 +33,21 @@ Start:  mov ax, 0           ; Stack initialisation
         mov ax, 04h         ; Set video mode to graphic
         int 10h
 
-        mov bx, [PADDLE_LEFT_Y_POS]         ; y position
-        push bx
-        mov bx, [PADDLE_LEFT_X_POS]         ; x position
-        push bx
-        call print_paddle
-
-        mov bx, [PADDLE_RIGHT_Y_POS]         ; y position
-        push bx
-        mov bx, [PADDLE_RIGHT_X_POS]         ; x position
-        push bx
-        call print_paddle
-
-        mov bx, [BALL_Y_POS]         ; y position
-        push bx
-        mov bx, [BALL_X_POS]         ; x position
-        push bx
-        call print_ball
-        
-        mov cx, [BALL_X_POS]
-        mov dx, [BALL_Y_POS]
-
 Loop:   
-        jmp Loop
-        mov ax, 06ffh  ; for speed of delay
-Delay2: mov bx, 0FFFFh ; for speed of delay
+        ; Start of delay code
+        mov ax, DELAY_2  ; for speed of delay
+Delay2: mov bx, DELAY_1 ; for speed of delay
 Delay:  dec bx
         cmp bx, 0h
         jne Delay
         dec ax
         jne Delay2
+        ; End of delay code
 
         call process_key
 
         call clear_screen
-        call ball_step
-        
+
         mov bx, [PADDLE_LEFT_Y_POS]         ; y position
         push bx
         mov bx, [PADDLE_LEFT_X_POS]         ; x position
@@ -83,9 +60,11 @@ Delay:  dec bx
         push bx
         call print_paddle
 
+        call ball_step
+        
 
-.skip_ball_step:
-        jmp Loop            ; Infinite loop
+
+        jmp Loop            ; Game Loop
 
 process_key:
         mov ah, 01h ; Test key BIOS
@@ -184,10 +163,6 @@ ball_step:
 
         call check_boundaries
 
-        mov ax, [BALL_Y_POS]         ; y position
-        push ax
-        mov ax, [BALL_X_POS]         ; x position
-        push ax
         call print_ball
 
         mov sp, bp
@@ -262,21 +237,17 @@ print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2
         ret
 
 print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
-    push bp
-    mov bp, sp
 
     mov ax, [BALL_SIZE]     ; y size
     push ax
     mov ax, [BALL_SIZE]     ; x size
     push ax
-    mov ax, [bp+6]              ; y coord
+    mov ax, [BALL_Y_POS]              ; y coord
     push ax
-    mov ax, [bp+4]              ; x coord
+    mov ax, [BALL_X_POS]              ; x coord
     push ax
     call print_box
 
-    mov sp, bp
-    pop bp
     ret
 
 print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
