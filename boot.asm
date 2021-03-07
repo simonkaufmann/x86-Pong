@@ -55,15 +55,11 @@ Delay:  dec bx
         int 10h
 
         mov bx, [PADDLE_LEFT_Y_POS]         ; y position
-        push bx
-        mov bx, [PADDLE_LEFT_X_POS]         ; x position
-        push bx
+        mov cx, [PADDLE_LEFT_X_POS]         ; x position
         call print_paddle
 
         mov bx, [PADDLE_RIGHT_Y_POS]         ; y position
-        push bx
-        mov bx, [PADDLE_RIGHT_X_POS]         ; x position
-        push bx
+        mov cx, [PADDLE_RIGHT_X_POS]         ; x position
         call print_paddle
 
         call ball_step
@@ -246,10 +242,9 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
     push ax
     mov ax, PADDLE_X_SIZE     ; x size
     push ax
-    mov ax, [bp+6]              ; y coord
-    push ax
-    mov ax, [bp+4]              ; x coord
-    push ax
+    push bx                   ; y coord
+    push cx                   ; x coord
+
     call print_box
 
     mov sp, bp
