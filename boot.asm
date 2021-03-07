@@ -50,7 +50,9 @@ Delay:  dec bx
 
         ; call process_key
 
-        call clear_screen
+        ; clear screen
+        mov ax, 04h         ; Set video mode to graphic will clear screen
+        int 10h
 
         mov bx, [PADDLE_LEFT_Y_POS]         ; y position
         push bx
@@ -199,17 +201,6 @@ check_boundaries:
         mov [BALL_SPEED_Y], cx
 .skip_cap_bottom_y:
         mov [BALL_Y_POS], ax
-
-        mov sp, bp
-        pop bp
-        ret
-
-clear_screen:
-        push bp
-        mov bp, sp
-
-        mov ax, 04h         ; Set video mode to graphic will clear screen
-        int 10h
 
         mov sp, bp
         pop bp
