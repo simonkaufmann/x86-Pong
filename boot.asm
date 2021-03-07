@@ -54,11 +54,11 @@ Delay:  dec bx
         mov ax, 04h         ; Set video mode to graphic will clear screen
         int 10h
 
-        mov bx, [PADDLE_LEFT_Y_POS]         ; y position
+        mov dx, [PADDLE_LEFT_Y_POS]         ; y position
         mov cx, [PADDLE_LEFT_X_POS]         ; x position
         call print_paddle
 
-        mov bx, [PADDLE_RIGHT_Y_POS]         ; y position
+        mov dx, [PADDLE_RIGHT_Y_POS]         ; y position
         mov cx, [PADDLE_RIGHT_X_POS]         ; x position
         call print_paddle
 
@@ -202,49 +202,28 @@ check_boundaries:
         pop bp
         ret
 
-print_pixel: ; arguments: x coordinate (2 byte), y coordinate (2 byte), color (2 bytes)
-        push bp
-        mov bp, sp
-
-        mov cx, [bp+4] ; x
-        mov dx, [bp+6] ; y
-        mov ax, [bp+8] ; color
-        mov ah, 0Ch
-        int 10h
-
-        mov sp, bp
-        pop bp
-        ret
-
-print_ball: ; arguments x coordinate (2 byte), y coordinate (2 byte)
+print_ball: ; cx: x coordinate, dx: y coordinate
     push bp
     mov bp, sp
 
-    mov ax, BALL_SIZE     ; y size
-    push ax
-    mov ax, BALL_SIZE     ; x size
-    push ax
-    mov ax, [BALL_Y_POS]              ; y coord
-    push ax
-    mov ax, [BALL_X_POS]              ; x coord
-    push ax
+    mov si, BALL_SIZE
+    add si, cx
+    mov di, BALL_SIZE
+    add di, dx
     call print_box
 
     mov sp, bp
     pop bp
     ret
 
-print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
+print_paddle: ; cx: x coordinate, dx: y coordinate
     push bp
     mov bp, sp
 
-    mov ax, PADDLE_Y_SIZE     ; y size
-    push ax
-    mov ax, PADDLE_X_SIZE     ; x size
-    push ax
-    push bx                   ; y coord
-    push cx                   ; x coord
-
+    mov si, PADDLE_X_SIZE
+    add si, cx
+    mov di, PADDLE_Y_SIZE
+    add di, dx
     call print_box
 
     mov sp, bp
@@ -252,51 +231,30 @@ print_paddle: ; arguments: x coordinate (2 byte), y coordinate (2 byte)
     ret
 
 print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
-        push bp
-        mov bp, sp
-
-        sub esp, 4
+        ; cx: x coordinate
+        ; dx: y coordinate
+        ; si: end x coordinate
+        ; di: end y coordinate
 
         ; for x to x + 10
         ; for y to y + 50
         ; print pixel
 
-        mov [bp-2], word 0 ;  i = 0
-.for_x: 
-        
-        mov [bp-4], word 0
+.for_x:
 .for_y:
-        mov cx, 15
-        push cx
-        mov bx, [bp-4]      ; y = index_y + y argument of print paddle
-        add bx, [bp+6]
-        push bx
-        mov ax, [bp-2]      ; x = index_x + x argument of print paddle
-        add ax, [bp+4]
-        push ax
-        call print_pixel
+        ; for print pixel (uses cx and dx as parameter)
+        mov ax, [bp+8] ; color
+        mov ah, 0Ch
+        int 10h
 
-        mov ax, [bp-4]      ; increment index_y by 1
-        add ax, 1
-        mov [bp-4], ax
-
-        mov ax, [bp-4]
-        mov bx, [bp+10]
-        cmp ax, bx     ; check index_y < y_size
-        jle .for_y
+        add dx, 1
+        cmp dx, si
+        jne .for_y
 .end_for_y:
-
-        mov ax, [bp-2]
-        add ax, 1
-        mov [bp-2], ax
-
-        mov ax, [bp-2]
-        cmp ax, [bp+8]     ; check index_x < x_size
-        jle .for_x
+        add cx, 1
+        cmp cx, di
+        jne .for_x
 .end_for_x:
-
-        mov sp, bp
-        pop bp
         ret
 
 PADDLE_LEFT_X_POS:
