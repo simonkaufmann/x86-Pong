@@ -58,9 +58,9 @@ Delay:  dec bx
         mov cx, [PADDLE_LEFT_X_POS]         ; x position
         call print_paddle
 
-        ;mov dx, [PADDLE_RIGHT_Y_POS]         ; y position
-        ;mov cx, [PADDLE_RIGHT_X_POS]         ; x position
-        ;call print_paddle
+        mov dx, [PADDLE_RIGHT_Y_POS]         ; y position
+        mov cx, [PADDLE_RIGHT_X_POS]         ; x position
+        call print_paddle
 
         ;call ball_step
         
