@@ -58,11 +58,11 @@ Delay:  dec bx
         mov cx, [PADDLE_LEFT_X_POS]         ; x position
         call print_paddle
 
-        mov dx, [PADDLE_RIGHT_Y_POS]         ; y position
-        mov cx, [PADDLE_RIGHT_X_POS]         ; x position
-        call print_paddle
+        ;mov dx, [PADDLE_RIGHT_Y_POS]         ; y position
+        ;mov cx, [PADDLE_RIGHT_X_POS]         ; x position
+        ;call print_paddle
 
-        call ball_step
+        ;call ball_step
         
         jmp Loop            ; Game Loop
 
@@ -240,19 +240,22 @@ print_box: ; arguments: x coord, y coord, x size, y size (2 bytes each)
         ; for y to y + 50
         ; print pixel
 
+        mov bx, cx ; store original y position
 .for_x:
 .for_y:
         ; for print pixel (uses cx and dx as parameter)
-        mov ax, [bp+8] ; color
+        mov al, 0fh
         mov ah, 0Ch
         int 10h
 
-        add dx, 1
-        cmp dx, si
+        add cx, 1
+        cmp cx, si
         jne .for_y
 .end_for_y:
-        add cx, 1
-        cmp cx, di
+        mov cx, bx ; reset y start position
+
+        add dx, 1
+        cmp dx, di
         jne .for_x
 .end_for_x:
         ret
