@@ -62,6 +62,14 @@ Delay:  dec bx
         mov cx, [PADDLE_RIGHT_X_POS]         ; x position
         call print_paddle
 
+        mov dx, [BALL_Y_POS]
+        mov cx, [BALL_X_POS]
+        mov si, BALL_SIZE
+        add si, cx
+        mov di, BALL_SIZE
+        add di, dx
+        call print_box
+
         ;call ball_step
         
         jmp Loop            ; Game Loop
@@ -154,7 +162,7 @@ ball_step:
 
         call check_boundaries
 
-        call print_ball
+        ;call print_ball
 
         mov sp, bp
         pop bp
@@ -201,20 +209,6 @@ check_boundaries:
         mov sp, bp
         pop bp
         ret
-
-print_ball: ; cx: x coordinate, dx: y coordinate
-    push bp
-    mov bp, sp
-
-    mov si, BALL_SIZE
-    add si, cx
-    mov di, BALL_SIZE
-    add di, dx
-    call print_box
-
-    mov sp, bp
-    pop bp
-    ret
 
 print_paddle: ; cx: x coordinate, dx: y coordinate
     push bp
